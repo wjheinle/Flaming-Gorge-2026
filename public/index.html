@@ -331,8 +331,9 @@
   .day-date{ font-size:12px; color: var(--mist); opacity:0.75; }
   .meal-row{
     display:flex;
-    gap:10px;
-    padding:8px 0;
+    flex-direction:column;
+    gap:6px;
+    padding:10px 0;
     border-top:1px solid rgba(255,255,255,0.06);
   }
   .meal-row:first-of-type{ border-top:none; }
@@ -342,12 +343,11 @@
     text-transform:uppercase;
     font-weight:700;
     color: var(--ember);
-    width:72px;
-    flex-shrink:0;
-    padding-top:10px;
+    padding-top:0;
   }
   .meal-input{
-    flex:1;
+    width:100%;
+    box-sizing:border-box;
     background: rgba(255,255,255,0.06);
     border:1px solid rgba(255,255,255,0.1);
     border-radius:10px;
@@ -356,8 +356,8 @@
     font-size:14px;
     font-family: inherit;
     resize:none;
-    min-height:40px;
-    line-height:1.4;
+    min-height:44px;
+    line-height:1.5;
   }
   .meal-input::placeholder{ color: rgba(207,227,234,0.35); font-style:italic; }
   .meal-input:focus{ outline:none; border-color: var(--ember); }
@@ -727,18 +727,16 @@ function renderMeals(days) {
         <div class="day-date">${d.date}</div>
       </div>
       ${d.slots.map((s, si) => `
-        <div class="meal-row" style="align-items:flex-start;">
+        <div class="meal-row">
           <div class="meal-tag">${s.tag}</div>
-          <div style="flex:1;">
-            <textarea
-              class="meal-input"
-              data-day="${d.id}"
-              data-slot="${si}"
-              placeholder="What's for ${s.tag.toLowerCase()}? Tap to plan..."
-              rows="2"
-            >${escapeHtml(s.meal)}</textarea>
-            <div class="meal-saved-flash" id="flash-${d.id}-${si}" style="opacity:0;"></div>
-          </div>
+          <textarea
+            class="meal-input"
+            data-day="${d.id}"
+            data-slot="${si}"
+            placeholder="What's for ${s.tag.toLowerCase()}? Tap to plan..."
+            rows="2"
+          >${escapeHtml(s.meal)}</textarea>
+          <div class="meal-saved-flash" id="flash-${d.id}-${si}" style="opacity:0;"></div>
         </div>
       `).join('')}
     </div>
@@ -778,7 +776,12 @@ async function saveMealSlot(ta) {
 }
 
 fetchMeals();
-setInterval(fetchMeals, 12000);
+setInterval(() => {
+  // Don't refresh while someone is actively typing in a meal field
+  const active = document.activeElement;
+  if (active && active.classList.contains('meal-input')) return;
+  fetchMeals();
+}, 12000);
 
 /* ---------------- Grocery list (shared backend) ---------------- */
 async function fetchGrocery(){
