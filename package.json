@@ -1,0 +1,15 @@
+{
+  "name": "flaminggorge2026",
+  "version": "1.0.0",
+  "description": "Flaming Gorge 2026 trip app",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

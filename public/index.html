@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Flaming Gorge">
+<title>Flaming Gorge 2026</title>
+<style>
+  :root{
+    --deep-water: #0d2b3e;
+    --dusk-water: #163c52;
+    --canyon-rust: #b5602f;
+    --sand: #e8dcc4;
+    --ember: #d97a3f;
+    --mist: #cfe3ea;
+    --white: #fdfbf7;
+    --ink: #10222b;
+  }
+  *{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    font-family:'DM Sans', -apple-system, sans-serif;
+    background: var(--deep-water);
+    color: var(--white);
+    overflow-x:hidden;
+    padding-bottom: 88px;
+  }
+  @font-face {
+    font-family: 'DM Sans';
+    src: local('Arial');
+  }
+  h1,h2,h3,.serif{
+    font-family:'Cormorant Garamond', Georgia, serif;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position:relative;
+    min-height: 62vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    padding: 24px 20px 28px;
+    overflow:hidden;
+  }
+  .hero-slides{
+    position:absolute;
+    inset:0;
+    z-index:0;
+  }
+  .hero-slide{
+    position:absolute;
+    inset:0;
+    background-size:cover;
+    background-position:center;
+    opacity:0;
+    transition: opacity 1.2s ease;
+  }
+  .hero-slide.active{ opacity:1; }
+  .hero-overlay{
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(120% 90% at 20% 0%, rgba(217,122,63,0.22), transparent 55%),
+      linear-gradient(180deg, rgba(13,43,62,0.2) 0%, rgba(13,43,62,0.82) 75%, var(--deep-water) 100%);
+    z-index:1;
+  }
+  .hero > *:not(.hero-slides):not(.hero-overlay){ position:relative; z-index:2; }
+  .hero-eyebrow{
+    letter-spacing:0.22em;
+    text-transform:uppercase;
+    font-size:11px;
+    color: var(--mist);
+    opacity:0.85;
+    margin-bottom:10px;
+    font-weight:600;
+  }
+  .hero-title{
+    font-size:44px;
+    line-height:1.02;
+    font-weight:600;
+    color: var(--white);
+    margin-bottom:6px;
+  }
+  .hero-sub{
+    font-size:15px;
+    color: var(--sand);
+    font-weight:400;
+    margin-bottom:22px;
+  }
+  .countdown-card{
+    background: rgba(253,251,247,0.97);
+    border-radius:18px;
+    padding:18px 16px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+    border-top: 3px solid var(--ember);
+  }
+  .countdown-label{
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color: var(--canyon-rust);
+    font-weight:700;
+    text-align:center;
+    margin-bottom:10px;
+  }
+  .countdown-grid{
+    display:grid;
+    grid-template-columns: repeat(4,1fr);
+    gap:8px;
+  }
+  .countdown-unit{ text-align:center; }
+  .countdown-num{
+    font-family:'Cormorant Garamond', Georgia, serif;
+    font-size:34px;
+    font-weight:700;
+    color: var(--ink);
+    line-height:1;
+  }
+  .countdown-unit-label{
+    font-size:9.5px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:#6b5a4a;
+    margin-top:4px;
+    font-weight:600;
+  }
+  .scroll-hint{
+    text-align:center;
+    font-size:11px;
+    color: var(--mist);
+    opacity:0.7;
+    margin-top:16px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+  }
+
+  /* ---------- Sections ---------- */
+  .section{ padding: 30px 20px 8px; }
+  .section-title{
+    font-size:24px;
+    font-weight:600;
+    margin-bottom:4px;
+    color: var(--white);
+  }
+  .section-sub{
+    font-size:13px;
+    color: var(--mist);
+    opacity:0.75;
+    margin-bottom:18px;
+  }
+
+  .card{
+    background: var(--dusk-water);
+    border-radius:16px;
+    padding:16px 16px;
+    margin-bottom:12px;
+    border:1px solid rgba(255,255,255,0.06);
+  }
+  .card-row{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
+  .card-title{ font-size:16px; font-weight:600; color:var(--white); }
+  .card-meta{ font-size:12.5px; color: var(--mist); opacity:0.8; margin-top:2px; }
+  .badge{
+    display:inline-block;
+    font-size:10.5px;
+    font-weight:700;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    padding:4px 9px;
+    border-radius:20px;
+    background: rgba(217,122,63,0.18);
+    color: var(--ember);
+    white-space:nowrap;
+  }
+
+  .link-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background: var(--dusk-water);
+    border-radius:14px;
+    padding:14px 16px;
+    margin-bottom:10px;
+    text-decoration:none;
+    color: var(--white);
+    border:1px solid rgba(255,255,255,0.06);
+  }
+  .link-item:active{ background: #1c4a63; }
+  .link-title{ font-size:15px; font-weight:600; }
+  .link-sub{ font-size:12px; color:var(--mist); opacity:0.75; margin-top:2px; }
+  .link-arrow{ font-size:18px; color: var(--ember); }
+
+  /* ---------- Grocery ---------- */
+  .add-row{
+    display:flex;
+    gap:8px;
+    margin-bottom:16px;
+  }
+  .add-row input[type=text]{
+    flex:1;
+    background: var(--dusk-water);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:12px;
+    padding:12px 14px;
+    color: var(--white);
+    font-size:15px;
+    font-family: inherit;
+  }
+  .add-row input::placeholder{ color: rgba(207,227,234,0.45); }
+  .add-btn{
+    background: var(--ember);
+    color: var(--ink);
+    border:none;
+    border-radius:12px;
+    padding:0 20px;
+    font-weight:700;
+    font-size:14px;
+    cursor:pointer;
+  }
+  select.cat-select{
+    background: var(--dusk-water);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:12px;
+    color: var(--white);
+    font-size:13px;
+    padding:10px 10px;
+    margin-bottom:14px;
+    width:100%;
+    font-family: inherit;
+  }
+  .progress-wrap{
+    margin-bottom:18px;
+  }
+  .progress-bar-bg{
+    background: rgba(255,255,255,0.08);
+    border-radius:20px;
+    height:8px;
+    overflow:hidden;
+  }
+  .progress-bar-fill{
+    background: linear-gradient(90deg, var(--ember), var(--canyon-rust));
+    height:100%;
+    border-radius:20px;
+    transition: width 0.3s ease;
+  }
+  .progress-text{
+    font-size:12px;
+    color: var(--mist);
+    opacity:0.8;
+    margin-top:6px;
+    text-align:right;
+  }
+  .cat-group{ margin-bottom:20px; }
+  .cat-header{
+    font-size:12px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color: var(--ember);
+    font-weight:700;
+    margin-bottom:8px;
+  }
+  .grocery-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background: var(--dusk-water);
+    border-radius:12px;
+    padding:12px 14px;
+    margin-bottom:8px;
+    border:1px solid rgba(255,255,255,0.06);
+  }
+  .grocery-check{
+    width:22px; height:22px;
+    border-radius:7px;
+    border:2px solid var(--ember);
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+  }
+  .grocery-check.checked{ background: var(--ember); }
+  .grocery-check.checked::after{ content:'✓'; color: var(--ink); font-size:14px; font-weight:800; }
+  .grocery-text{ flex:1; font-size:14.5px; }
+  .grocery-text.checked{ text-decoration:line-through; opacity:0.45; }
+  .grocery-by{ font-size:11px; color: var(--mist); opacity:0.6; }
+  .grocery-del{
+    color: rgba(207,227,234,0.5);
+    font-size:18px;
+    cursor:pointer;
+    padding:2px 6px;
+  }
+  .empty-state{
+    text-align:center;
+    padding:30px 10px;
+    color: var(--mist);
+    opacity:0.6;
+    font-size:13.5px;
+  }
+  .clear-btn{
+    display:block;
+    width:100%;
+    background: transparent;
+    border:1px solid rgba(255,255,255,0.15);
+    color: var(--mist);
+    padding:12px;
+    border-radius:12px;
+    font-size:13px;
+    font-weight:600;
+    margin-top:6px;
+    cursor:pointer;
+  }
+
+  /* ---------- Meal plan ---------- */
+  .day-card{
+    background: var(--dusk-water);
+    border-radius:16px;
+    padding:16px;
+    margin-bottom:12px;
+    border:1px solid rgba(255,255,255,0.06);
+  }
+  .day-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:10px;
+  }
+  .day-name{ font-size:17px; font-weight:700; }
+  .day-date{ font-size:12px; color: var(--mist); opacity:0.75; }
+  .meal-row{
+    display:flex;
+    gap:10px;
+    padding:8px 0;
+    border-top:1px solid rgba(255,255,255,0.06);
+  }
+  .meal-row:first-of-type{ border-top:none; }
+  .meal-tag{
+    font-size:10.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    font-weight:700;
+    color: var(--ember);
+    width:72px;
+    flex-shrink:0;
+    padding-top:10px;
+  }
+  .meal-input{
+    flex:1;
+    background: rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:10px;
+    padding:9px 12px;
+    color: var(--white);
+    font-size:14px;
+    font-family: inherit;
+    resize:none;
+    min-height:40px;
+    line-height:1.4;
+  }
+  .meal-input::placeholder{ color: rgba(207,227,234,0.35); font-style:italic; }
+  .meal-input:focus{ outline:none; border-color: var(--ember); }
+  .meal-saved-flash{ color: var(--ember); font-size:11px; margin-top:4px; text-align:right; height:14px; transition:opacity 0.4s; }
+
+  /* ---------- Tab bar ---------- */
+  .tabbar{
+    position:fixed;
+    bottom:0; left:0; right:0;
+    background: rgba(13,43,62,0.97);
+    backdrop-filter: blur(10px);
+    border-top:1px solid rgba(255,255,255,0.08);
+    display:flex;
+    padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
+    z-index:100;
+  }
+  .tab{
+    flex:1;
+    text-align:center;
+    padding:6px 2px;
+    color: rgba(207,227,234,0.5);
+    font-size:10.5px;
+    font-weight:600;
+    cursor:pointer;
+    border:none;
+    background:none;
+    font-family: inherit;
+  }
+  .tab .tab-icon{ font-size:19px; display:block; margin-bottom:2px; }
+  .tab.active{ color: var(--ember); }
+
+  .page{ display:none; animation: fadeIn 0.25s ease; }
+  .page.active{ display:block; }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  .footer-note{
+    text-align:center;
+    font-size:11px;
+    color: var(--mist);
+    opacity:0.4;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    padding: 30px 20px 10px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= TRIP TAB ================= -->
+<div id="page-trip" class="page active">
+  <div class="hero">
+    <div class="hero-slides" id="hero-slides">
+      <div class="hero-slide active" style="background-image:url('https://photos.zillowstatic.com/fp/7e754d206fbd4b47e81a46059436b18d-cc_ft_960.jpg')"></div>
+      <div class="hero-slide" style="background-image:url('https://photos.zillowstatic.com/fp/6b18f78c6aec13eb95d6a589930db5e7-cc_ft_576.jpg')"></div>
+      <div class="hero-slide" style="background-image:url('https://photos.zillowstatic.com/fp/0277557e9c8e7b3bd0accf5cf915e693-cc_ft_576.jpg')"></div>
+      <div class="hero-slide" style="background-image:url('https://photos.zillowstatic.com/fp/839b263a07030d01bce6d58ee209a4fa-cc_ft_576.jpg')"></div>
+      <div class="hero-slide" style="background-image:url('https://photos.zillowstatic.com/fp/492fcaa44fb8ce62713483bf58f92d45-cc_ft_576.jpg')"></div>
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="hero-eyebrow">Flaming Gorge Reservoir · Utah/Wyoming</div>
+    <h1 class="hero-title">Gorge Week<br>2026</h1>
+    <div class="hero-sub">Seven nights on the water — July 18–25</div>
+    <div class="countdown-card">
+      <div class="countdown-label" id="countdown-label">Until we check in</div>
+      <div class="countdown-grid" id="countdown-grid">
+        <div class="countdown-unit"><div class="countdown-num" id="cd-days">--</div><div class="countdown-unit-label">Days</div></div>
+        <div class="countdown-unit"><div class="countdown-num" id="cd-hours">--</div><div class="countdown-unit-label">Hrs</div></div>
+        <div class="countdown-unit"><div class="countdown-num" id="cd-mins">--</div><div class="countdown-unit-label">Min</div></div>
+        <div class="countdown-unit"><div class="countdown-num" id="cd-secs">--</div><div class="countdown-unit-label">Sec</div></div>
+      </div>
+    </div>
+    <div class="scroll-hint">Scroll down for details ↓</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">The Rundown</div>
+    <div class="section-sub">A Week on Flaming Gorge!</div>
+
+    <div class="card">
+      <div class="card-row">
+        <div>
+          <div class="card-title">Check-In</div>
+          <div class="card-meta">Saturday, July 18, 2026 · 3:00 PM MT</div>
+        </div>
+        <span class="badge">Arrive</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-row">
+        <div>
+          <div class="card-title">On the Water</div>
+          <div class="card-meta">7 nights · Flaming Gorge Reservoir</div>
+        </div>
+        <span class="badge">7 Nights</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-row">
+        <div>
+          <div class="card-title">Check-Out</div>
+          <div class="card-meta">Saturday, July 25, 2026 · 12:00 PM MT</div>
+        </div>
+        <span class="badge">Depart</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">The Property</div>
+    <div class="section-sub">Our home base on the gorge</div>
+    <div class="card">
+      <div class="card-title" style="margin-bottom:2px;">The Lake House at Flaming Gorge</div>
+      <div class="card-meta" style="margin-bottom:12px;">1538 E Steinaker Way N · Manila, UT 84046</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px;">
+        <div style="background:rgba(255,255,255,0.05); border-radius:10px; padding:10px 12px;">
+          <div style="font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--ember); font-weight:700; margin-bottom:3px;">Beds / Baths</div>
+          <div style="font-size:14px; font-weight:600;">3 bed · 2 bath</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.05); border-radius:10px; padding:10px 12px;">
+          <div style="font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--ember); font-weight:700; margin-bottom:3px;">Size</div>
+          <div style="font-size:14px; font-weight:600;">1,794 sq ft</div>
+        </div>
+      </div>
+      <div style="font-size:12.5px; color:var(--mist); opacity:0.85; line-height:1.6; margin-bottom:14px;">
+        Remodeled lake house with panoramic gorge &amp; mountain views. Open-concept layout, double fridge/freezer, covered deck, fire pit, boat parking, fish cleaning station, and soaking tub in the primary suite.
+      </div>
+      <a href="https://maps.apple.com/?address=1538+E+Steinaker+Way+N,+Manila,+UT+84046" target="_blank" rel="noopener"
+         style="display:inline-block; background:var(--ember); color:var(--ink); font-size:12.5px; font-weight:700; padding:8px 16px; border-radius:10px; text-decoration:none;">
+        Directions &#8599;
+      </a>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">The Crew</div>
+    <div class="card">
+      <div class="card-meta" style="font-size:14px; color:var(--white); line-height:1.9;">
+        Marc, Pam &amp; Noelle<br>
+        Bill &amp; Melissa<br>
+        Hailey &amp; Billy
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">Flaming Gorge · July 2026</div>
+</div>
+
+<!-- ================= LINKS TAB ================= -->
+<div id="page-links" class="page">
+  <div class="section" style="padding-top:36px;">
+    <div class="section-title">Links</div>
+    <div class="section-sub">Everything you need in one place</div>
+
+    <a class="link-item" href="https://maps.apple.com/?address=1538+E+Steinaker+Way+N,+Manila,+UT+84046" target="_blank" rel="noopener">
+      <div>
+        <div class="link-title">Directions to the Property</div>
+        <div class="link-sub">1538 E Steinaker Way N, Manila, UT 84046</div>
+      </div>
+      <div class="link-arrow">↗</div>
+    </a>
+
+    <a class="link-item" href="https://www.weather.gov/" target="_blank" rel="noopener">
+      <div>
+        <div class="link-title">Weather Forecast</div>
+        <div class="link-sub">Check conditions before we go</div>
+      </div>
+      <div class="link-arrow">↗</div>
+    </a>
+
+    <a class="link-item" href="https://www.recreation.gov/" target="_blank" rel="noopener">
+      <div>
+        <div class="link-title">Recreation.gov</div>
+        <div class="link-sub">Campsite / marina reservations</div>
+      </div>
+      <div class="link-arrow">↗</div>
+    </a>
+
+    <a class="link-item" href="https://ffslakes.utah.gov/water-recreation/flaming-gorge/" target="_blank" rel="noopener">
+      <div>
+        <div class="link-title">Utah State Parks — Flaming Gorge</div>
+        <div class="link-sub">Marina info &amp; lake conditions</div>
+      </div>
+      <div class="link-arrow">↗</div>
+    </a>
+
+    <a class="link-item" href="https://wgfd.wyo.gov/fishing" target="_blank" rel="noopener">
+      <div>
+        <div class="link-title">Wyoming Game &amp; Fish — Fishing</div>
+        <div class="link-sub">Licenses &amp; regulations</div>
+      </div>
+      <div class="link-arrow">↗</div>
+    </a>
+
+    <a class="link-item" href="https://www.fs.usda.gov/r04/ashley/recreation/flaming-gorge-national-recreation-area-0" target="_blank" rel="noopener">
+      <div>
+        <div class="link-title">Flaming Gorge National Recreation Area</div>
+        <div class="link-sub">USDA Forest Service — Ashley National Forest</div>
+      </div>
+      <div class="link-arrow">↗</div>
+    </a>
+  </div>
+  <div class="footer-note">Flaming Gorge · July 2026</div>
+</div>
+
+<!-- ================= MEALS TAB ================= -->
+<div id="page-meals" class="page">
+  <div class="section" style="padding-top:36px;">
+    <div class="section-title">Meal Plan</div>
+    <div class="section-sub">Tap any meal to edit — changes save for the whole crew</div>
+    <div id="meal-days"><div class="empty-state">Loading meal plan...</div></div>
+  </div>
+  <div class="footer-note">Flaming Gorge · July 2026</div>
+</div>
+
+<!-- ================= GROCERY TAB ================= -->
+<div id="page-grocery" class="page">
+  <div class="section" style="padding-top:36px;">
+    <div class="section-title">Grocery List</div>
+    <div class="section-sub">Shared with the whole crew — add away</div>
+
+    <div class="add-row">
+      <input type="text" id="grocery-input" placeholder="Add an item..." />
+      <button class="add-btn" id="grocery-add-btn">Add</button>
+    </div>
+    <select class="cat-select" id="grocery-cat">
+      <option value="Produce">Produce</option>
+      <option value="Meat & Seafood">Meat &amp; Seafood</option>
+      <option value="Dairy & Eggs">Dairy &amp; Eggs</option>
+      <option value="Pantry">Pantry</option>
+      <option value="Drinks">Drinks</option>
+      <option value="Snacks">Snacks</option>
+      <option value="Supplies">Supplies</option>
+      <option value="Other">Other</option>
+    </select>
+
+    <div class="progress-wrap">
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="progress-text" id="progress-text">0 of 0 grabbed</div>
+    </div>
+
+    <div id="grocery-list"></div>
+
+    <button class="clear-btn" id="clear-checked-btn">Remove checked items</button>
+  </div>
+  <div class="footer-note">Flaming Gorge · July 2026</div>
+</div>
+
+<!-- ================= TAB BAR ================= -->
+<div class="tabbar">
+  <button class="tab active" data-page="trip"><span class="tab-icon">⛰️</span>Trip</button>
+  <button class="tab" data-page="links"><span class="tab-icon">🔗</span>Links</button>
+  <button class="tab" data-page="meals"><span class="tab-icon">🍳</span>Meals</button>
+  <button class="tab" data-page="grocery"><span class="tab-icon">🛒</span>Grocery</button>
+</div>
+
+<script>
+/* ---------------- Tab navigation ---------------- */
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('page-' + btn.dataset.page).classList.add('active');
+    window.scrollTo(0,0);
+  });
+});
+
+/* ---------------- Hero slideshow ---------------- */
+(function(){
+  const slides = document.querySelectorAll('.hero-slide');
+  if (!slides.length) return;
+  let cur = 0;
+  setInterval(() => {
+    slides[cur].classList.remove('active');
+    cur = (cur + 1) % slides.length;
+    slides[cur].classList.add('active');
+  }, 5000);
+})();
+
+/* ---------------- Countdown ---------------- */
+// Check-in: July 18, 2026, 3:00 PM Mountain Time (MDT = UTC-6)
+const checkIn = new Date('2026-07-18T15:00:00-06:00');
+// Check-out: July 25, 2026, 12:00 PM Mountain Time
+const checkOut = new Date('2026-07-25T12:00:00-06:00');
+
+function updateCountdown(){
+  const now = new Date();
+  let target, label;
+  if (now < checkIn) {
+    target = checkIn;
+    label = 'Until we check in';
+  } else if (now < checkOut) {
+    target = checkOut;
+    label = 'Until we check out';
+  } else {
+    document.getElementById('countdown-label').textContent = 'See you next year!';
+    document.getElementById('countdown-grid').style.display = 'none';
+    return;
+  }
+  document.getElementById('countdown-label').textContent = label;
+  const diff = target - now;
+  const days = Math.floor(diff / (1000*60*60*24));
+  const hours = Math.floor((diff / (1000*60*60)) % 24);
+  const mins = Math.floor((diff / (1000*60)) % 60);
+  const secs = Math.floor((diff / 1000) % 60);
+  document.getElementById('cd-days').textContent = days;
+  document.getElementById('cd-hours').textContent = String(hours).padStart(2,'0');
+  document.getElementById('cd-mins').textContent = String(mins).padStart(2,'0');
+  document.getElementById('cd-secs').textContent = String(secs).padStart(2,'0');
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+/* ---------------- Meal plan (shared/editable) ---------------- */
+let mealSaveTimers = {};
+
+async function fetchMeals() {
+  try {
+    const res = await fetch('/api/meals');
+    const data = await res.json();
+    renderMeals(data.days || []);
+  } catch(e) {
+    document.getElementById('meal-days').innerHTML = '<div class="empty-state">Could not load meal plan. Check your connection.</div>';
+  }
+}
+
+function renderMeals(days) {
+  const container = document.getElementById('meal-days');
+  container.innerHTML = days.map((d, di) => `
+    <div class="day-card">
+      <div class="day-head">
+        <div class="day-name">${d.name}</div>
+        <div class="day-date">${d.date}</div>
+      </div>
+      ${d.slots.map((s, si) => `
+        <div class="meal-row" style="align-items:flex-start;">
+          <div class="meal-tag">${s.tag}</div>
+          <div style="flex:1;">
+            <textarea
+              class="meal-input"
+              data-day="${d.id}"
+              data-slot="${si}"
+              placeholder="What's for ${s.tag.toLowerCase()}? Tap to plan..."
+              rows="2"
+            >${escapeHtml(s.meal)}</textarea>
+            <div class="meal-saved-flash" id="flash-${d.id}-${si}" style="opacity:0;"></div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+
+  // Attach save-on-blur listeners
+  container.querySelectorAll('.meal-input').forEach(ta => {
+    ta.addEventListener('input', () => {
+      const key = ta.dataset.day + '-' + ta.dataset.slot;
+      clearTimeout(mealSaveTimers[key]);
+      mealSaveTimers[key] = setTimeout(() => saveMealSlot(ta), 1200);
+    });
+    ta.addEventListener('blur', () => saveMealSlot(ta));
+  });
+}
+
+async function saveMealSlot(ta) {
+  const dayId = ta.dataset.day;
+  const slotIndex = ta.dataset.slot;
+  const meal = ta.value.trim();
+  const flashId = 'flash-' + dayId + '-' + slotIndex;
+  try {
+    await fetch('/api/meals/' + dayId + '/' + slotIndex, {
+      method: 'PATCH',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ meal })
+    });
+    const flash = document.getElementById(flashId);
+    if (flash) {
+      flash.textContent = '✓ Saved';
+      flash.style.opacity = '1';
+      setTimeout(() => { flash.style.opacity = '0'; }, 2000);
+    }
+  } catch(e) {
+    console.error('Save failed', e);
+  }
+}
+
+fetchMeals();
+setInterval(fetchMeals, 12000);
+
+/* ---------------- Grocery list (shared backend) ---------------- */
+async function fetchGrocery(){
+  try {
+    const res = await fetch('/api/grocery');
+    const data = await res.json();
+    renderGrocery(data.items || []);
+  } catch(e) {
+    document.getElementById('grocery-list').innerHTML = '<div class="empty-state">Could not load the list. Check your connection.</div>';
+  }
+}
+
+function renderGrocery(items){
+  const listEl = document.getElementById('grocery-list');
+  const total = items.length;
+  const checkedCount = items.filter(i => i.checked).length;
+  document.getElementById('progress-fill').style.width = total ? (checkedCount/total*100) + '%' : '0%';
+  document.getElementById('progress-text').textContent = `${checkedCount} of ${total} grabbed`;
+
+  if (!total) {
+    listEl.innerHTML = '<div class="empty-state">The list is empty. Add the first item above.</div>';
+    return;
+  }
+
+  const categories = {};
+  items.forEach(i => {
+    const cat = i.category || 'Other';
+    if (!categories[cat]) categories[cat] = [];
+    categories[cat].push(i);
+  });
+
+  listEl.innerHTML = Object.keys(categories).sort().map(cat => `
+    <div class="cat-group">
+      <div class="cat-header">${cat}</div>
+      ${categories[cat].map(item => `
+        <div class="grocery-item">
+          <div class="grocery-check ${item.checked ? 'checked' : ''}" data-id="${item.id}"></div>
+          <div style="flex:1;">
+            <div class="grocery-text ${item.checked ? 'checked' : ''}">${escapeHtml(item.text)}</div>
+          </div>
+          <div class="grocery-del" data-id="${item.id}">×</div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+
+  listEl.querySelectorAll('.grocery-check').forEach(el => {
+    el.addEventListener('click', async () => {
+      const id = el.dataset.id;
+      const nowChecked = !el.classList.contains('checked');
+      el.classList.toggle('checked');
+      await fetch('/api/grocery/' + id, {
+        method: 'PATCH',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({checked: nowChecked})
+      });
+      fetchGrocery();
+    });
+  });
+
+  listEl.querySelectorAll('.grocery-del').forEach(el => {
+    el.addEventListener('click', async () => {
+      const id = el.dataset.id;
+      await fetch('/api/grocery/' + id, { method:'DELETE' });
+      fetchGrocery();
+    });
+  });
+}
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+document.getElementById('grocery-add-btn').addEventListener('click', addGroceryItem);
+document.getElementById('grocery-input').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') addGroceryItem();
+});
+
+async function addGroceryItem(){
+  const input = document.getElementById('grocery-input');
+  const cat = document.getElementById('grocery-cat').value;
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  await fetch('/api/grocery', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({text, category: cat})
+  });
+  fetchGrocery();
+}
+
+document.getElementById('clear-checked-btn').addEventListener('click', async () => {
+  if (!confirm('Remove all checked items from the list?')) return;
+  await fetch('/api/grocery/clear-checked', { method:'POST' });
+  fetchGrocery();
+});
+
+fetchGrocery();
+setInterval(fetchGrocery, 8000); // poll so everyone stays in sync
+</script>
+</body>
+</html>
