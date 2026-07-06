@@ -15,12 +15,12 @@ const MEALS_FILE   = path.join(DATA_DIR, 'meals.json');
 const DEFAULT_MEALS = {
   days: [
     { id: 'jul18', name: 'Saturday', date: 'Jul 18', slots: [ { tag: 'Dinner', meal: '' } ] },
-    { id: 'jul19', name: 'Sunday',   date: 'Jul 19', slots: [ { tag: 'Breakfast', meal: '' }, { tag: 'Dinner', meal: '' } ] },
-    { id: 'jul20', name: 'Monday',   date: 'Jul 20', slots: [ { tag: 'Breakfast', meal: '' }, { tag: 'Dinner', meal: '' } ] },
-    { id: 'jul21', name: 'Tuesday',  date: 'Jul 21', slots: [ { tag: 'Breakfast', meal: '' }, { tag: 'Dinner', meal: '' } ] },
-    { id: 'jul22', name: 'Wednesday',date: 'Jul 22', slots: [ { tag: 'Breakfast', meal: '' }, { tag: 'Dinner', meal: '' } ] },
-    { id: 'jul23', name: 'Thursday', date: 'Jul 23', slots: [ { tag: 'Breakfast', meal: '' }, { tag: 'Dinner', meal: '' } ] },
-    { id: 'jul24', name: 'Friday',   date: 'Jul 24', slots: [ { tag: 'Breakfast', meal: '' }, { tag: 'Dinner', meal: '' } ] },
+    { id: 'jul19', name: 'Sunday',   date: 'Jul 19', slots: [ { tag: 'Breakfast', meal: '' }, { tag: 'Lunch', meal: '' }, { tag: 'Dinner', meal: '' } ] },
+    { id: 'jul20', name: 'Monday',   date: 'Jul 20', slots: [ { tag: 'Breakfast', meal: '' }, { tag: 'Lunch', meal: '' }, { tag: 'Dinner', meal: '' } ] },
+    { id: 'jul21', name: 'Tuesday',  date: 'Jul 21', slots: [ { tag: 'Breakfast', meal: '' }, { tag: 'Lunch', meal: '' }, { tag: 'Dinner', meal: '' } ] },
+    { id: 'jul22', name: 'Wednesday',date: 'Jul 22', slots: [ { tag: 'Breakfast', meal: '' }, { tag: 'Lunch', meal: '' }, { tag: 'Dinner', meal: '' } ] },
+    { id: 'jul23', name: 'Thursday', date: 'Jul 23', slots: [ { tag: 'Breakfast', meal: '' }, { tag: 'Lunch', meal: '' }, { tag: 'Dinner', meal: '' } ] },
+    { id: 'jul24', name: 'Friday',   date: 'Jul 24', slots: [ { tag: 'Breakfast', meal: '' }, { tag: 'Lunch', meal: '' }, { tag: 'Dinner', meal: '' } ] },
     { id: 'jul25', name: 'Saturday', date: 'Jul 25', slots: [ { tag: 'Breakfast', meal: '' } ] },
   ]
 };
