@@ -10,6 +10,7 @@ if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
 const GROCERY_FILE = path.join(DATA_DIR, 'grocery.json');
 const MEALS_FILE   = path.join(DATA_DIR, 'meals.json');
+const PACKING_FILE = path.join(DATA_DIR, 'packing.json');
 
 // Default meal structure — slots only, no pre-filled names
 const DEFAULT_MEALS = {
@@ -30,6 +31,11 @@ function loadGrocery() {
 }
 function saveGrocery(data) { fs.writeFileSync(GROCERY_FILE, JSON.stringify(data, null, 2)); }
 
+function loadPacking() {
+  try { return JSON.parse(fs.readFileSync(PACKING_FILE, 'utf8')); } catch { return { items: [] }; }
+}
+function savePacking(data) { fs.writeFileSync(PACKING_FILE, JSON.stringify(data, null, 2)); }
+
 function loadMeals() {
   try { return JSON.parse(fs.readFileSync(MEALS_FILE, 'utf8')); } catch { return DEFAULT_MEALS; }
 }
@@ -49,6 +55,8 @@ app.post('/api/grocery', (req, res) => {
     id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
     text: text.trim(),
     category: category || 'Other',
+    qty: req.body.qty || null,
+    addedBy: req.body.addedBy || '',
     checked: false,
     createdAt: new Date().toISOString()
   };
@@ -63,6 +71,8 @@ app.patch('/api/grocery/:id', (req, res) => {
   if (!item) return res.status(404).json({ error: 'not found' });
   if (typeof req.body.checked === 'boolean') item.checked = req.body.checked;
   if (typeof req.body.text === 'string') item.text = req.body.text;
+  if (req.body.qty !== undefined) item.qty = req.body.qty;
+  if (req.body.addedBy !== undefined) item.addedBy = req.body.addedBy;
   saveGrocery(data);
   res.json(item);
 });
@@ -96,7 +106,88 @@ app.patch('/api/meals/:dayId/:slotIndex', (req, res) => {
   res.json({ ok: true, slot });
 });
 
+/* ---- Packing list endpoints ---- */
+app.get('/api/packing', (req, res) => res.json(loadPacking()));
+
+app.post('/api/packing', (req, res) => {
+  const { text, who } = req.body;
+  if (!text || !text.trim()) return res.status(400).json({ error: 'text required' });
+  const data = loadPacking();
+  const item = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+    text: text.trim(),
+    who: who || 'All',
+    checked: false,
+    createdAt: new Date().toISOString()
+  };
+  data.items.push(item);
+  savePacking(data);
+  res.json(item);
+});
+
+app.patch('/api/packing/:id', (req, res) => {
+  const data = loadPacking();
+  const item = data.items.find(i => i.id === req.params.id);
+  if (!item) return res.status(404).json({ error: 'not found' });
+  if (typeof req.body.checked === 'boolean') item.checked = req.body.checked;
+  if (typeof req.body.text === 'string') item.text = req.body.text;
+  if (typeof req.body.who === 'string') item.who = req.body.who;
+  savePacking(data);
+  res.json(item);
+});
+
+app.delete('/api/packing/:id', (req, res) => {
+  const data = loadPacking();
+  data.items = data.items.filter(i => i.id !== req.params.id);
+  savePacking(data);
+  res.json({ ok: true });
+});
+
+/* ---- Grocery merge endpoint ---- */
+// POST /api/grocery/merge  { ids: [...], mergedText: 'Eggs', contributions: [{addedBy,qty,note}] }
+app.post('/api/grocery/merge', (req, res) => {
+  const { ids, mergedText, qty, contributions } = req.body;
+  if (!ids || !ids.length) return res.status(400).json({ error: 'ids required' });
+  const data = loadGrocery();
+  // Remove all items being merged
+  data.items = data.items.filter(i => !ids.includes(i.id));
+  // Add the merged item
+  const merged = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+    text: mergedText || 'Merged item',
+    category: req.body.category || 'Other',
+    qty: qty || null,
+    contributions: contributions || [],
+    checked: false,
+    merged: true,
+    createdAt: new Date().toISOString()
+  };
+  data.items.push(merged);
+  saveGrocery(data);
+  res.json(merged);
+});
+
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
+
+/* ---- Inactivity shutdown — sleep after 30 min of no API calls ---- */
+const IDLE_MS = 30 * 60 * 1000;
+let idleTimer;
+
+function resetIdleTimer() {
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => {
+    console.log('No activity for 30 minutes — shutting down to save resources.');
+    process.exit(0); // Railway will restart on next request via its wake-on-request feature
+  }, IDLE_MS);
+}
+
+// Reset idle timer on every incoming request
+app.use((req, res, next) => {
+  resetIdleTimer();
+  next();
+});
+
+resetIdleTimer();
 
 app.listen(PORT, () => {
   console.log(`Flaming Gorge 2026 app running on port ${PORT}`);
