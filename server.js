@@ -169,26 +169,6 @@ app.post('/api/grocery/merge', (req, res) => {
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
-/* ---- Inactivity shutdown — sleep after 30 min of no API calls ---- */
-const IDLE_MS = 30 * 60 * 1000;
-let idleTimer;
-
-function resetIdleTimer() {
-  clearTimeout(idleTimer);
-  idleTimer = setTimeout(() => {
-    console.log('No activity for 30 minutes — shutting down to save resources.');
-    process.exit(0); // Railway will restart on next request via its wake-on-request feature
-  }, IDLE_MS);
-}
-
-// Reset idle timer on every incoming request
-app.use((req, res, next) => {
-  resetIdleTimer();
-  next();
-});
-
-resetIdleTimer();
-
 app.listen(PORT, () => {
   console.log(`Flaming Gorge 2026 app running on port ${PORT}`);
 });
